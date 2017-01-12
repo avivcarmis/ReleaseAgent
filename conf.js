@@ -1,7 +1,7 @@
 module.exports = {
-	
-	versionFilePath: "",
-	
-	releaseDirPath: ""
-	
+
+    versionFilePath: "",
+
+    releaseDirPath: ""
+
 };
