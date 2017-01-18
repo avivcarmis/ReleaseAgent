@@ -29,7 +29,7 @@ function createReleaseNotes() {
             output += "None\n";
             continue;
         }
-        list.sort(function(a, b) {
+        list.sort(function (a, b) {
             return a.date - b.date;
         });
         for (var i = 0; i < list.length; i++) {
@@ -40,7 +40,6 @@ function createReleaseNotes() {
         }
     }
     common.validateDir(common.getConf().releaseDirPath);
-    common.writeFile(releaseFilepath, output, function() {
-        console.log('created release file => ' + releaseFilepath + "\n" + output);
-    });
+    common.writeFile(releaseFilepath, output);
+    console.log('created release file => ' + releaseFilepath + "\n" + output);
 }

@@ -19,29 +19,29 @@ var versionFormatStructure = [
 
 var methods = {
 
-    readVersion: function() {
+    readVersion: function () {
         return fs.readFileSync(methods.getConf().versionFilePath).toString();
     },
 
-    getSupportedFlags: function() {
+    getSupportedFlags: function () {
         return supportedFlags;
     },
 
-    getVersionFormatStructure: function() {
+    getVersionFormatStructure: function () {
         return versionFormatStructure;
     },
 
-    getConf: function() {
+    getConf: function () {
         return require('./conf');
     },
 
-    validateFileNotExist: function(path, errorMessage) {
+    validateFileNotExist: function (path, errorMessage) {
         if (fs.existsSync(path)) {
             methods.exit(errorMessage);
         }
     },
 
-    writeData: function(dir, data, callback) {
+    writeData: function (dir, data) {
         dir = "./data/" + dir;
         methods.validateDir(dir);
         var date = methods.getDate();
@@ -49,37 +49,40 @@ var methods = {
         hash = hash.replace(".", "");
         var filename = date + '-' + hash;
         data = date + "\n" + data;
-        methods.writeFile(dir + "/" + filename, data, callback);
+        methods.writeFile(dir + "/" + filename, data);
     },
 
-    validateDir: function(dir) {
+    validateDir: function (dir) {
         if (!fs.existsSync(dir)) {
             fs.mkdirSync(dir);
         }
     },
 
-    getDate: function() {
+    getDate: function () {
         var date = new Date();
         return date.getTime();
     },
 
-    getData: function() {
+    getData: function () {
         return data;
     },
 
-    replaceAll: function(str, search, target) {
+    replaceAll: function (str, search, target) {
         while (str.indexOf(search) != -1) {
             str = str.replace(search, target);
         }
         return str;
     },
 
-    readAllData: function() {
+    readAllData: function () {
         var result = {};
         for (var i = 0; i < supportedFlags.length; i++) {
             var attribute = supportedFlags[i].meaning;
             result[attribute] = [];
             var dir = './data/' + attribute + '/';
+            if (!fs.existsSync(dir)) {
+                continue;
+            }
             var files = fs.readdirSync(dir);
             for (var j = 0; j < files.length; j++) {
                 var data = fs.readFileSync(dir + files[j]).toString();
@@ -93,7 +96,7 @@ var methods = {
         return result;
     },
 
-    clearData: function() {
+    clearData: function () {
         for (var i = 0; i < supportedFlags.length; i++) {
             var attribute = supportedFlags[i].meaning;
             var dir = './data/' + attribute;
@@ -101,41 +104,39 @@ var methods = {
         }
     },
 
-    clearDir: function(path) {
+    clearDir: function (path) {
+        if (!fs.existsSync(path)) {
+            return;
+        }
         var files = fs.readdirSync(path);
         for (var j = 0; j < files.length; j++) {
             fs.unlinkSync(path + '/' + files[j]);
         }
     },
 
-    setData: function(data) {
+    setData: function (data) {
         data = "module.exports = " + JSON.stringify(data) + ";";
         methods.writeFile('./data/data.js', data);
     },
 
-    readFile: function(path, callback) {
+    readFile: function (path, callback) {
         fs.readFile(path, 'utf8', function (err, data) {
             methods.validateError(err);
             callback(data);
         });
     },
 
-    writeFile: function(path, data, callback) {
-        fs.writeFile(path, data, function(err) {
-            methods.validateError(err);
-            if (callback) {
-                callback();
-            }
-        });
+    writeFile: function (path, data) {
+        fs.writeFileSync(path, data);
     },
 
-    validateError: function(err) {
+    validateError: function (err) {
         if (err) {
             methods.exit(err);
         }
     },
 
-    exit: function(msg) {
+    exit: function (msg) {
         console.log(msg);
         process.exit(-1);
     }
